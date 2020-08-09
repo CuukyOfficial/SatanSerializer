@@ -25,6 +25,10 @@ public class Serializer {
 	static final byte INDEX_DOUBLE = 8;
 	static final byte INDEX_BOOL = 9;
 	static final byte INDEX_UUID = 10;
+	static final byte INDEX_LIST = 11;
+	static final byte INDEX_CUSTOM_LIST = 12;
+	static final byte INDEX_MAP = 13;
+	static final byte INDEX_CUSTOM_MAP = 14;
 	
 	static final List<Class<?>> GLOBAL_WHITELIST = new ArrayList<>();
 	

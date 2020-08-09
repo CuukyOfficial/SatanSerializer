@@ -11,13 +11,17 @@ public class Main {
 		
 		serializer.setProtected(false);
 		serializer.loadClass(TestObject.class, 50);
+		serializer.loadClass(TestList.class, 1);
+		serializer.loadClass(TestMap.class, 2);
 		
-		byte[] data = serializer.serialize(new TestObject(5, "Hello World", "test"));
+		TestObject original = new TestObject(5, "Hello World", "test");
+		byte[] data = serializer.serialize(original);
 		
 		System.out.println(Arrays.toString(data));
 		
 		TestObject deserialized = (TestObject) serializer.deserialize(data);
-		System.out.println(deserialized.a + " : " + deserialized.b + " : " + deserialized.c);
-		
+		System.out.println(deserialized.toString());
+		System.out.println();
+		System.out.println(original.toString().equals(deserialized.toString()));
 	}
 }

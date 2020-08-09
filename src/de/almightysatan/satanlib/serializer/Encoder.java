@@ -3,7 +3,11 @@ package de.almightysatan.satanlib.serializer;
 import static de.almightysatan.satanlib.serializer.Serializer.*;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 class Encoder {
@@ -13,16 +17,16 @@ class Encoder {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
 
-		serializeField(serializer, dos, o, ENCODER_VERSION, false); //the annotation id of the root object is the version of the serializer
+		dos.writeInt(ENCODER_VERSION);
+		
+		serializeField(serializer, dos, o, false); //the annotation id of the root object is the version of the serializer
 
 		dos.close();
 
 		return bos.toByteArray();
 	}
 
-	private void serializeField(Serializer serializer, DataOutputStream dos, Object o, int aId, boolean useJavaSerializer) throws Throwable {
-		dos.writeInt(aId); //write annotation id
-
+	private void serializeField(Serializer serializer, DataOutputStream dos, Object o, boolean useJavaSerializer) throws Throwable {
 		if (o != null) {
 			if(useJavaSerializer) {
 				dos.writeByte(INDEX_JAVA_OBJECT);
@@ -74,18 +78,56 @@ class Encoder {
 				dos.writeBoolean((boolean) o);
 				return;
 			}
-			
+
 			if(o instanceof UUID) {
 				dos.writeByte(INDEX_UUID);
-				
+
 				UUID uuid = (UUID) o;
-				
+
 				dos.writeLong(uuid.getMostSignificantBits());
 				dos.writeLong(uuid.getLeastSignificantBits());
 				return;
 			}
 
 			SerializableClazz clazz = serializer.clazzMap.get(o.getClass());
+
+			if(o instanceof List<?>) {
+				if(clazz == null) {
+					dos.writeByte(INDEX_LIST);
+					dos.writeUTF(o.getClass().getName());
+					
+					writeListData(serializer, dos, o);
+					return;
+				}else {
+					dos.writeByte(INDEX_CUSTOM_LIST);
+					dos.writeInt(clazz.id);
+					
+					writeListData(serializer, dos, o);
+					
+					writeCustomFields(serializer, dos, clazz, o);
+					return;
+				}
+
+			}
+			
+			if(o instanceof Map<?, ?>) {
+				if(clazz == null) {
+					dos.writeByte(INDEX_MAP);
+					dos.writeUTF(o.getClass().getName());
+					
+					writeMapData(serializer, dos, o);
+					return;
+				}else {
+					dos.writeByte(INDEX_CUSTOM_MAP);
+					dos.writeInt(clazz.id);
+					
+					writeMapData(serializer, dos, o);
+					
+					writeCustomFields(serializer, dos, clazz, o);
+					return;
+				}
+			}
+
 			if(clazz != null) {
 				if(o instanceof Enum<?>) {
 					dos.writeByte(INDEX_CUSTOM_ENUM);
@@ -99,18 +141,48 @@ class Encoder {
 							break;
 						}
 					}
+					
+					return;
 				}else{
 					dos.writeByte(INDEX_CUSTOM_OBJECT);
 					dos.writeInt(clazz.id);
-
-
-					for (SerializableField sField : clazz.fields.values())
-						serializeField(serializer, dos, sField.get(o), sField.id, sField.javaSerializer);
-
-					dos.writeInt(INDEX_BREAK);
+					
+					writeCustomFields(serializer, dos, clazz, o);
+					
+					return;
 				}
-			}else
-				throw new Error("Unable to serialize object: " + o.getClass().getName());
+			}
+			
+			throw new Error("Unable to serialize object: " + o.getClass().getName());
+		}
+	}
+	
+	private void writeCustomFields(Serializer serializer, DataOutputStream dos, SerializableClazz clazz, Object instance) throws IOException, Throwable {
+		for (SerializableField sField : clazz.fields.values()) {
+			dos.writeInt(sField.id); //write annotation id
+			serializeField(serializer, dos, sField.get(instance), sField.javaSerializer);
+		}
+
+		dos.writeInt(INDEX_BREAK);
+	}
+	
+	private void writeListData(Serializer serializer, DataOutputStream dos, Object instance) throws Throwable {
+		List<?> list = (List<?>) instance;
+		
+		dos.writeInt(list.size());
+		
+		for(Object element : list)
+			serializeField(serializer, dos, element, false); //never use java serializer
+	}
+	
+	private void writeMapData(Serializer serializer, DataOutputStream dos, Object instance) throws Throwable {
+		Map<?, ?> map = (Map<?, ?>) instance;
+		
+		dos.writeInt(map.size());
+		
+		for(Entry<?, ?> entry : map.entrySet()) {
+			serializeField(serializer, dos, entry.getKey(), false);
+			serializeField(serializer, dos, entry.getValue(), false);
 		}
 	}
 }
