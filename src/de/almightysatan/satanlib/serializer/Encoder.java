@@ -13,27 +13,27 @@ import java.util.UUID;
 class Encoder {
 
 
-	byte[] serialize(Serializer serializer, Object o) throws Throwable {
+	byte[] serialize(Serializer serializer, Object instance) throws Throwable {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
 
 		dos.writeInt(ENCODER_VERSION);
 		
-		serializeField(serializer, dos, o, false); //the annotation id of the root object is the version of the serializer
+		serializeField(serializer, dos, instance, false);
 
 		dos.close();
 
 		return bos.toByteArray();
 	}
 
-	private void serializeField(Serializer serializer, DataOutputStream dos, Object o, boolean useJavaSerializer) throws Throwable {
-		if (o != null) {
+	private void serializeField(Serializer serializer, DataOutputStream dos, Object instance, boolean useJavaSerializer) throws Throwable {
+		if (instance != null) {
 			if(useJavaSerializer) {
 				dos.writeByte(INDEX_JAVA_OBJECT);
 
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				ObjectOutputStream oos = new ObjectOutputStream(bos);
-				oos.writeObject(o);
+				oos.writeObject(instance);
 				oos.close();
 
 				byte[] data = bos.toByteArray();
@@ -43,133 +43,134 @@ class Encoder {
 				return;
 			}
 			
-			if(o instanceof Byte) {
+			if(instance instanceof Byte) {
 				dos.writeByte(INDEX_BYTE);
-				dos.writeByte((byte) o);
+				dos.writeByte((byte) instance);
 				return;
 			}
 			
-			if(o instanceof Short) {
+			if(instance instanceof Short) {
 				dos.writeByte(INDEX_SHORT);
-				dos.writeShort((short) o);
+				dos.writeShort((short) instance);
 				return;
 			}
 
-			if(o instanceof Integer) {
+			if(instance instanceof Integer) {
 				dos.writeByte(INDEX_INT);
-				dos.writeInt((int) o);
+				dos.writeInt((int) instance);
 				return;
 			}
 
-			if(o instanceof Long) {
+			if(instance instanceof Long) {
 				dos.writeByte(INDEX_LONG);
-				dos.writeLong((long) o);
+				dos.writeLong((long) instance);
 				return;
 			}
 
-			if(o instanceof Float) {
+			if(instance instanceof Float) {
 				dos.writeByte(INDEX_FLOAT);
-				dos.writeFloat((float) o);
+				dos.writeFloat((float) instance);
 				return;
 			}
 
-			if(o instanceof Double) {
+			if(instance instanceof Double) {
 				dos.writeByte(INDEX_DOUBLE);
-				dos.writeDouble((double) o);
+				dos.writeDouble((double) instance);
 				return;
 			}
 
-			if(o instanceof Boolean) {
+			if(instance instanceof Boolean) {
 				dos.writeByte(INDEX_BOOL);
-				dos.writeBoolean((boolean) o);
+				dos.writeBoolean((boolean) instance);
 				return;
 			}
 			
-			if(o instanceof Character) {
+			if(instance instanceof Character) {
 				dos.writeByte(INDEX_CHAR);
-				dos.writeChar((char) o);
+				dos.writeChar((char) instance);
 				return;
 			}
 			
-			if(o instanceof String) {
+			if(instance instanceof String) {
 				dos.writeByte(INDEX_STRING);
-				dos.writeUTF((String) o);
+				dos.writeUTF((String) instance);
 				return;
 			}
 
-			if(o instanceof UUID) {
+			if(instance instanceof UUID) {
 				dos.writeByte(INDEX_UUID);
 
-				UUID uuid = (UUID) o;
+				UUID uuid = (UUID) instance;
 
 				dos.writeLong(uuid.getMostSignificantBits());
 				dos.writeLong(uuid.getLeastSignificantBits());
 				return;
 			}
 			
-			if(o instanceof Object[]) {
-				SerializableClazz clazz = serializer.clazzMap.get(o.getClass().getComponentType());
+			if(instance instanceof Object[]) {
+				SerializableClazz clazz = serializer.clazzMap.get(instance.getClass().getComponentType());
 				
 				if(clazz == null) {
 					dos.writeByte(INDEX_ARRAY);
-					dos.writeUTF(o.getClass().getComponentType().getName());
+					dos.writeUTF(instance.getClass().getComponentType().getName());
 				}else {
 					dos.writeByte(INDEX_CUSTOM_ARRAY);
 					dos.writeInt(clazz.id);
 				}
 				
-				writeArrayData(serializer, dos, o);
+				writeArrayData(serializer, dos, instance);
 				return;
 			}
 
-			SerializableClazz clazz = serializer.clazzMap.get(o.getClass());
+			SerializableClazz clazz = serializer.clazzMap.get(instance.getClass());
 
-			if(o instanceof List<?>) {
+			if(instance instanceof List<?>) {
 				if(clazz == null) {
 					dos.writeByte(INDEX_LIST);
-					dos.writeUTF(o.getClass().getName());
+					dos.writeUTF(instance.getClass().getName());
 					
-					writeListData(serializer, dos, o);
+					writeListData(serializer, dos, instance);
 					return;
 				}else {
 					dos.writeByte(INDEX_CUSTOM_LIST);
 					dos.writeInt(clazz.id);
 					
-					writeListData(serializer, dos, o);
+					writeListData(serializer, dos, instance);
 					
-					writeCustomFields(serializer, dos, clazz, o);
+					writeCustomFields(serializer, dos, clazz, instance);
 					return;
 				}
 
 			}
 			
-			if(o instanceof Map<?, ?>) {
+			if(instance instanceof Map<?, ?>) {
 				if(clazz == null) {
 					dos.writeByte(INDEX_MAP);
-					dos.writeUTF(o.getClass().getName());
+					dos.writeUTF(instance.getClass().getName());
 					
-					writeMapData(serializer, dos, o);
+					writeMapData(serializer, dos, instance);
 					return;
 				}else {
 					dos.writeByte(INDEX_CUSTOM_MAP);
 					dos.writeInt(clazz.id);
 					
-					writeMapData(serializer, dos, o);
+					writeMapData(serializer, dos, instance);
 					
-					writeCustomFields(serializer, dos, clazz, o);
+					writeCustomFields(serializer, dos, clazz, instance);
 					return;
 				}
 			}
 
 			if(clazz != null) {
-				if(o instanceof Enum<?>) {
+				if(instance instanceof Enum<?>) {
 					dos.writeByte(INDEX_CUSTOM_ENUM);
 					dos.writeInt(clazz.id);
 
+					//TODO this is slow and should be optimized
 					for (SerializableField sField : clazz.fields.values()) {
-						Object fieldObject = sField.get(o);
+						Object fieldObject = sField.get(instance);
 
-						if(o == fieldObject) {
+						if(instance == fieldObject) {
 							dos.writeInt(sField.id);
 							break;
 						}
@@ -180,13 +181,13 @@ class Encoder {
 					dos.writeByte(INDEX_CUSTOM_OBJECT);
 					dos.writeInt(clazz.id);
 					
-					writeCustomFields(serializer, dos, clazz, o);
+					writeCustomFields(serializer, dos, clazz, instance);
 					
 					return;
 				}
 			}
 			
-			throw new Error("Unable to serialize object: " + o.getClass().getName());
+			throw new Error("Unable to serialize object: " + instance.getClass().getName());
 		}
 	}
 	
