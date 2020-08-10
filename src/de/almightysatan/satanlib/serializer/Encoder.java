@@ -88,6 +88,21 @@ class Encoder {
 				dos.writeLong(uuid.getLeastSignificantBits());
 				return;
 			}
+			
+			if(o instanceof Object[]) {
+				SerializableClazz clazz = serializer.clazzMap.get(o.getClass().getComponentType());
+				
+				if(clazz == null) {
+					dos.writeByte(INDEX_ARRAY);
+					dos.writeUTF(o.getClass().getComponentType().getName());
+				}else {
+					dos.writeByte(INDEX_CUSTOM_ARRAY);
+					dos.writeInt(clazz.id);
+				}
+				
+				writeArrayData(serializer, dos, o);
+				return;
+			}
 
 			SerializableClazz clazz = serializer.clazzMap.get(o.getClass());
 
@@ -173,6 +188,15 @@ class Encoder {
 		
 		for(Object element : list)
 			serializeField(serializer, dos, element, false); //never use java serializer
+	}
+	
+	private void writeArrayData(Serializer serializer, DataOutputStream dos, Object instance) throws Throwable {
+		Object[] array = (Object[]) instance;
+		
+		dos.writeInt(array.length);
+		
+		for(Object element : array)
+			serializeField(serializer, dos, element, false);
 	}
 	
 	private void writeMapData(Serializer serializer, DataOutputStream dos, Object instance) throws Throwable {

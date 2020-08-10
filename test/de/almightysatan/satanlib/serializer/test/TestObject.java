@@ -1,6 +1,7 @@
 package de.almightysatan.satanlib.serializer.test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import de.almightysatan.satanlib.serializer.JavaSerializer;
@@ -30,6 +31,12 @@ public class TestObject {
 	@SerializeId(6)
 	private TestMap customMap;
 	
+	@SerializeId(7)
+	private String[] array;
+	
+	@SerializeId(8)
+	private TestObject2[] customArray;
+	
 	public TestObject(int a, String b, String c) {
 		this.a = a;
 		this.b = b;
@@ -42,12 +49,14 @@ public class TestObject {
 		this.map.put("test0", "abc");
 		this.map.put("test1", "def");
 		this.customMap = new TestMap(420);
+		this.array = new String[] {"ArrayObject0", "ArrayObject1"};
+		this.customArray = new TestObject2[] {new TestObject2(5), new TestObject2(10)};
 	}
 	
 	public TestObject() {}
 	
 	@Override
 	public String toString() {
-		return a + " : " + b + " : " + c + " : " + list + " : " + customList + " : " + map  + " : " + customMap;
+		return a + " : " + b + " : " + c + " : " + list + " : " + customList + " : " + map  + " : " + customMap + " : " + Arrays.toString(array) + " : " + Arrays.toString(customArray);
 	}
 }

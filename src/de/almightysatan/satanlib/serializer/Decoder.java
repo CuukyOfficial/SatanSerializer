@@ -5,6 +5,7 @@ import static de.almightysatan.satanlib.serializer.Serializer.*;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.ObjectInputStream;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +88,25 @@ class Decoder {
 			readCustomFields(serializer, dis, clazz, customList);
 			
 			return customList;
+		case INDEX_ARRAY:
+			@SuppressWarnings("unchecked")
+			Class<? extends Object[]> arrayClass = (Class<? extends Object[]>) Class.forName(dis.readUTF());
+			
+			int size = dis.readInt();
+			
+			Object[] array = (Object[]) Array.newInstance(arrayClass, size);
+			readArrayData(serializer, dis, array, size);
+			return array;
+		case INDEX_CUSTOM_ARRAY:
+			clazzId = dis.readInt();
+			clazz = serializer.clazzIdMap.get(clazzId);
+			verifyClass(clazz, clazzId);
+			
+			size = dis.readInt();
+			
+			array = (Object[]) Array.newInstance(clazz.clazz, size);
+			readArrayData(serializer, dis, array, size);
+			return array;
 		case INDEX_MAP:
 			@SuppressWarnings("unchecked")
 			Class<? extends Map<Object, Object>> mapClass = (Class<? extends Map<Object, Object>>) Class.forName(dis.readUTF());
@@ -132,6 +152,11 @@ class Decoder {
 		
 		for(int index = 0; index < size; index++)
 			list.add(deserializeField(serializer, dis));
+	}
+	
+	private void readArrayData(Serializer serializer, DataInputStream dis, Object[] array, int size) throws Throwable {
+		for(int index = 0; index < size; index++)
+			array[index] = deserializeField(serializer, dis);
 	}
 	
 	private void readMapData(Serializer serializer, DataInputStream dis, Map<Object, Object> map) throws Throwable {
