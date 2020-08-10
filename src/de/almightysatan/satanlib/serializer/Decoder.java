@@ -55,8 +55,10 @@ class Decoder {
 
 			SerializableField field = clazz.fields.get(dis.readInt());
 			return field.get(null);
-		case INDEX_STRING:
-			return dis.readUTF();
+		case INDEX_BYTE:
+			return dis.readByte();
+		case INDEX_SHORT:
+			return dis.readShort();
 		case INDEX_INT:
 			return dis.readInt();
 		case INDEX_LONG:
@@ -67,6 +69,10 @@ class Decoder {
 			return dis.readDouble();
 		case INDEX_BOOL:
 			return dis.readBoolean();
+		case INDEX_CHAR:
+			return dis.readChar();
+		case INDEX_STRING:
+			return dis.readUTF();
 		case INDEX_UUID:
 			return new UUID(dis.readLong(), dis.readLong());
 		case INDEX_LIST:

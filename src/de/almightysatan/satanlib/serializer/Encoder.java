@@ -42,10 +42,16 @@ class Encoder {
 				bos.close();
 				return;
 			}
-
-			if(o instanceof String) {
-				dos.writeByte(INDEX_STRING);
-				dos.writeUTF((String) o);
+			
+			if(o instanceof Byte) {
+				dos.writeByte(INDEX_BYTE);
+				dos.writeByte((byte) o);
+				return;
+			}
+			
+			if(o instanceof Short) {
+				dos.writeByte(INDEX_SHORT);
+				dos.writeShort((short) o);
 				return;
 			}
 
@@ -76,6 +82,18 @@ class Encoder {
 			if(o instanceof Boolean) {
 				dos.writeByte(INDEX_BOOL);
 				dos.writeBoolean((boolean) o);
+				return;
+			}
+			
+			if(o instanceof Character) {
+				dos.writeByte(INDEX_CHAR);
+				dos.writeChar((char) o);
+				return;
+			}
+			
+			if(o instanceof String) {
+				dos.writeByte(INDEX_STRING);
+				dos.writeUTF((String) o);
 				return;
 			}
 

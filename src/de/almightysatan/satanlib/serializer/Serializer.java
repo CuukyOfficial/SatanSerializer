@@ -18,19 +18,22 @@ public class Serializer {
 	static final byte INDEX_JAVA_OBJECT = 1;
 	static final byte INDEX_CUSTOM_OBJECT = 2;
 	static final byte INDEX_CUSTOM_ENUM = 3;
-	static final byte INDEX_STRING = 4;
-	static final byte INDEX_INT = 5;
-	static final byte INDEX_LONG = 6;
-	static final byte INDEX_FLOAT = 7;
-	static final byte INDEX_DOUBLE = 8;
-	static final byte INDEX_BOOL = 9;
-	static final byte INDEX_UUID = 10;
-	static final byte INDEX_LIST = 11;
-	static final byte INDEX_CUSTOM_LIST = 12;
-	static final byte INDEX_ARRAY = 13;
-	static final byte INDEX_CUSTOM_ARRAY = 14;
-	static final byte INDEX_MAP = 15;
-	static final byte INDEX_CUSTOM_MAP = 16;
+	static final byte INDEX_BYTE = 4;
+	static final byte INDEX_SHORT = 5;
+	static final byte INDEX_INT = 6;
+	static final byte INDEX_LONG = 7;
+	static final byte INDEX_FLOAT = 8;
+	static final byte INDEX_DOUBLE = 9;
+	static final byte INDEX_BOOL = 10;
+	static final byte INDEX_CHAR = 11;
+	static final byte INDEX_STRING = 12;
+	static final byte INDEX_UUID = 13;
+	static final byte INDEX_LIST = 14;
+	static final byte INDEX_CUSTOM_LIST = 15;
+	static final byte INDEX_ARRAY = 16;
+	static final byte INDEX_CUSTOM_ARRAY = 17;
+	static final byte INDEX_MAP = 18;
+	static final byte INDEX_CUSTOM_MAP = 19;
 	
 	static final List<Class<?>> GLOBAL_WHITELIST = new ArrayList<>();
 	
