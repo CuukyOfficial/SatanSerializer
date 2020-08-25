@@ -19,9 +19,8 @@ class SerializableClazz {
 		
 		try {
 			this.constructor = clazz.getDeclaredConstructor();
-		}catch(NoSuchMethodException | SecurityException e) {
-			throw new Error("Class has no empty constructor " + clazz.getName());
-		}
+			this.constructor.setAccessible(true);
+		}catch(NoSuchMethodException | SecurityException e) {}
 		
 		loadFields(clazz, annotationManager);
 	}
@@ -47,6 +46,9 @@ class SerializableClazz {
 	}
 
 	Object newInstance() throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		if(this.constructor == null)
+			throw new Error("Class has no empty constructor " + clazz.getName());
+		
 		return this.constructor.newInstance();
 	}
 }
