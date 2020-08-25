@@ -39,6 +39,9 @@ public class TestObject {
 
 	@SerializeId(9)
 	private byte[] byteArray;
+	
+	@SerializeId(10)
+	private String nullTest;
 
 	public TestObject(int a, String b, String c) {
 		this.a = a;

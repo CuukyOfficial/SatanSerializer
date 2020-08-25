@@ -201,8 +201,12 @@ class Encoder {
 	
 	private void writeCustomFields(Serializer serializer, DataOutputStream dos, SerializableClazz clazz, Object instance) throws IOException, Throwable {
 		for (SerializableField sField : clazz.fields.values()) {
-			dos.writeInt(sField.id); //write annotation id
-			serializeField(serializer, dos, sField.get(instance), sField.javaSerializer);
+			Object value = sField.get(instance);
+			
+			if(value != null) {
+				dos.writeInt(sField.id); //write annotation id
+				serializeField(serializer, dos, value, sField.javaSerializer);
+			}
 		}
 
 		dos.writeInt(INDEX_BREAK);
