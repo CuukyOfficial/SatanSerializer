@@ -32,6 +32,7 @@ public class Serializer {
 	static final byte INDEX_CUSTOM_LIST = 15;
 	static final byte INDEX_ARRAY = 16;
 	static final byte INDEX_CUSTOM_ARRAY = 17;
+	static final byte INDEX_PRIMITIVE_ARRAY = 20;
 	static final byte INDEX_MAP = 18;
 	static final byte INDEX_CUSTOM_MAP = 19;
 	

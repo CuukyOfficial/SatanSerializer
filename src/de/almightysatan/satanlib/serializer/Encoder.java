@@ -5,13 +5,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
 class Encoder {
-
 
 	byte[] serialize(Serializer serializer, Object instance) throws Throwable {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -121,6 +121,14 @@ class Encoder {
 				writeArrayData(serializer, dos, instance);
 				return;
 			}
+			
+			if(instance.getClass().isArray()) {
+				dos.writeByte(INDEX_PRIMITIVE_ARRAY);
+				dos.writeUTF(instance.getClass().getComponentType().getName());
+				
+				writePrimitiveArrayData(serializer, dos, instance);
+				return;
+			}
 
 			SerializableClazz clazz = serializer.clazzMap.get(instance.getClass());
 
@@ -216,6 +224,15 @@ class Encoder {
 		
 		for(Object element : array)
 			serializeField(serializer, dos, element, false);
+	}
+	
+	private void writePrimitiveArrayData(Serializer serializer, DataOutputStream dos, Object instance) throws Throwable {
+		int length = Array.getLength(instance);
+		
+		dos.writeInt(length);
+		
+		for(int i = 0; i < length; i++)
+			serializeField(serializer, dos, Array.get(instance, i), false);
 	}
 	
 	private void writeMapData(Serializer serializer, DataOutputStream dos, Object instance) throws Throwable {

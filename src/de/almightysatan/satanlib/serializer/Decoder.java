@@ -94,11 +94,19 @@ class Decoder {
 			readCustomFields(serializer, dis, clazz, customList);
 			
 			return customList;
+		case INDEX_PRIMITIVE_ARRAY:
+			Class<?> primitiveArrayClass = (Class<?>) getPrimitiveClass(dis.readUTF());
+			
+			int size = dis.readInt();
+			
+			Object primitiveArray = Array.newInstance(primitiveArrayClass, size);
+			readPrimitiveArrayData(serializer, dis, primitiveArray, size);
+			return primitiveArray;
 		case INDEX_ARRAY:
 			@SuppressWarnings("unchecked")
 			Class<? extends Object[]> arrayClass = (Class<? extends Object[]>) Class.forName(dis.readUTF());
 			
-			int size = dis.readInt();
+			size = dis.readInt();
 			
 			Object[] array = (Object[]) Array.newInstance(arrayClass, size);
 			readArrayData(serializer, dis, array, size);
@@ -153,11 +161,25 @@ class Decoder {
 			clazz.fields.get(field.getKey()).set(instance, field.getValue());
 	}
 	
+	private Class<?> getPrimitiveClass(String name) throws ClassNotFoundException {
+		switch (name) {
+		case "byte":
+			return byte.class;
+		default:
+			throw new Error();
+		}
+	}
+	
 	private void readListData(Serializer serializer, DataInputStream dis, List<Object> list) throws Throwable {
 		int size = dis.readInt();
 		
 		for(int index = 0; index < size; index++)
 			list.add(deserializeField(serializer, dis));
+	}
+	
+	private void readPrimitiveArrayData(Serializer serializer, DataInputStream dis, Object array, int size) throws Throwable {
+		for(int index = 0; index < size; index++)
+			Array.set(array, index, deserializeField(serializer, dis));
 	}
 	
 	private void readArrayData(Serializer serializer, DataInputStream dis, Object[] array, int size) throws Throwable {
