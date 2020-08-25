@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Serializer {
 	
-	public static final String VERSION = "1.0.1";
+	public static final String VERSION = "1.1.0";
 	public static final int ENCODER_VERSION = 1;
 	
 	static final byte INDEX_BREAK = -1;
