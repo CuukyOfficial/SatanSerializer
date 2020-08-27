@@ -28,7 +28,9 @@ class Decoder {
 
 		switch(type) {
 		case INDEX_JAVA_OBJECT:
-			ByteArrayInputStream bis = new ByteArrayInputStream(dis.readNBytes(dis.readInt()));
+			byte[] data = new byte[dis.readInt()];
+			dis.read(data);
+			ByteArrayInputStream bis = new ByteArrayInputStream(data);
 			ObjectInputStream ois = new ObjectInputStream(bis);
 
 			Object deserialized = ois.readObject();
