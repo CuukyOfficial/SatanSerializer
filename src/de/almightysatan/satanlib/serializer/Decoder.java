@@ -24,6 +24,9 @@ class Decoder {
 	}
 
 	private Object deserializeField(Serializer serializer, DataInputStream dis) throws Throwable {
+		if(dis.available() == 0)
+			return null;
+		
 		byte type = dis.readByte();
 
 		switch(type) {
