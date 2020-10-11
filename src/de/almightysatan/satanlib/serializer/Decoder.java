@@ -53,6 +53,13 @@ class Decoder {
 			readCustomFields(serializer, dis, clazz, object);
 			
 			return object;
+		case INDEX_JAVA_ENUM:
+			@SuppressWarnings("rawtypes")
+			Class enumClazz = Class.forName(dis.readUTF());
+			
+			@SuppressWarnings("unchecked")
+			Object enumObject = Enum.valueOf(enumClazz, dis.readUTF());
+			return enumObject;
 		case INDEX_CUSTOM_ENUM:
 			clazzId = dis.readInt();
 			clazz = serializer.clazzIdMap.get(clazzId);

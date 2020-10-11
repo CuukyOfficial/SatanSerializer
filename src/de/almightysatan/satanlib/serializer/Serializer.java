@@ -11,12 +11,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Serializer {
 	
-	public static final String VERSION = "1.1.3";
+	public static final String VERSION = "1.2.0";
 	public static final int ENCODER_VERSION = 1;
 	
 	static final byte INDEX_BREAK = -1;
 	static final byte INDEX_JAVA_OBJECT = 1;
 	static final byte INDEX_CUSTOM_OBJECT = 2;
+	static final byte INDEX_JAVA_ENUM = 21;
 	static final byte INDEX_CUSTOM_ENUM = 3;
 	static final byte INDEX_BYTE = 4;
 	static final byte INDEX_SHORT = 5;

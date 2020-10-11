@@ -3,6 +3,7 @@ package de.almightysatan.satanlib.serializer.test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import de.almightysatan.satanlib.serializer.JavaSerializer;
 import de.almightysatan.satanlib.serializer.SerializeId;
@@ -42,6 +43,9 @@ public class TestObject {
 	
 	@SerializeId(10)
 	private String nullTest;
+	
+	@SerializeId(11)
+	private TimeUnit enumTest;
 
 	public TestObject(int a, String b, String c) {
 		this.a = a;
@@ -58,6 +62,7 @@ public class TestObject {
 		this.array = new String[] {"ArrayObject0", "ArrayObject1"};
 		this.customArray = new TestObject2[] {new TestObject2(5), new TestObject2(10)};
 		this.byteArray = new byte[] {10, 20};
+		this.enumTest = TimeUnit.MILLISECONDS;
 	}
 
 	public TestObject() {}
@@ -65,6 +70,6 @@ public class TestObject {
 	@Override
 	public String toString() {
 		return a + " : " + b + " : " + c + " : " + list + " : " + customList + " : " + map  + " : "
-				+ customMap + " : " + Arrays.toString(array) + " : " + Arrays.toString(customArray) + " : " + Arrays.toString(byteArray);
+				+ customMap + " : " + Arrays.toString(array) + " : " + Arrays.toString(customArray) + " : " + Arrays.toString(byteArray) + " : " + enumTest.name();
 	}
 }
