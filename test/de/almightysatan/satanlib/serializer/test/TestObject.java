@@ -46,6 +46,9 @@ public class TestObject {
 	
 	@SerializeId(11)
 	private TimeUnit enumTest;
+	
+	@SerializeId(12)
+	private TestEnum customEnumTest;
 
 	public TestObject(int a, String b, String c) {
 		this.a = a;
@@ -63,6 +66,7 @@ public class TestObject {
 		this.customArray = new TestObject2[] {new TestObject2(5), new TestObject2(10)};
 		this.byteArray = new byte[] {10, 20};
 		this.enumTest = TimeUnit.MILLISECONDS;
+		this.customEnumTest = TestEnum.B;
 	}
 
 	public TestObject() {}
@@ -70,6 +74,6 @@ public class TestObject {
 	@Override
 	public String toString() {
 		return a + " : " + b + " : " + c + " : " + list + " : " + customList + " : " + map  + " : "
-				+ customMap + " : " + Arrays.toString(array) + " : " + Arrays.toString(customArray) + " : " + Arrays.toString(byteArray) + " : " + enumTest.name();
+				+ customMap + " : " + Arrays.toString(array) + " : " + Arrays.toString(customArray) + " : " + Arrays.toString(byteArray) + " : " + enumTest.name() + " : " + customEnumTest.name();
 	}
 }

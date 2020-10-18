@@ -14,6 +14,7 @@ public class Main {
 		serializer.loadClass(TestList.class, 1);
 		serializer.loadClass(TestMap.class, 2);
 		serializer.loadClass(TestObject2.class, 3);
+		serializer.loadClass(TestEnum.class, 4);
 		
 		TestObject original = new TestObject(5, "Hello World", "test");
 		byte[] data = serializer.serialize(original);

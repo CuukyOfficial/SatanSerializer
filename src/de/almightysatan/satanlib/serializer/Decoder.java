@@ -66,7 +66,7 @@ class Decoder {
 			verifyClass(clazz, clazzId);
 
 			SerializableField field = clazz.fields.get(dis.readInt());
-			return field.get(null);
+			return field.getStatic();
 		case INDEX_BYTE:
 			return dis.readByte();
 		case INDEX_SHORT:

@@ -183,7 +183,7 @@ class Encoder {
 	
 					//TODO this is slow and should be optimized
 					for (SerializableField sField : clazz.fields.values()) {
-						Object fieldObject = sField.get(instance);
+						Object fieldObject = sField.getStatic();
 	
 						if(instance == fieldObject) {
 							dos.writeInt(sField.id);

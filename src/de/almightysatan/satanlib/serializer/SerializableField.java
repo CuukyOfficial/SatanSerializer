@@ -31,6 +31,13 @@ class SerializableField {
 		}
 	}
 	
+	Object getStatic() throws Throwable {
+		if(USE_METHODHANDLES)
+			return getter.invoke();
+		else
+			return field.get(null);
+	}
+	
 	Object get(Object instance) throws Throwable {
 		if(USE_METHODHANDLES)
 			return getter.invoke(instance);
